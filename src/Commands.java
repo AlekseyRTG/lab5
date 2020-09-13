@@ -28,7 +28,7 @@ public class Commands {
 
     static void info(){
         String date;
-        if(){
+        if(true){
             System.out.println(" ");
             System.out.println("Тип коллекции: ");
         }

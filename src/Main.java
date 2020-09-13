@@ -2,6 +2,7 @@ import java.util.*;
 public class Main{
     public static void main(String[] args) {
 
+        /*
         Scanner in = new Scanner(System.in);
         System.out.print("Input a command ");
         String command = in.nextLine();
@@ -13,5 +14,8 @@ public class Main{
         }
 
         in.close();
+
+         */
+        ProductMacker.ProductFromBuffer();
     }
 }
