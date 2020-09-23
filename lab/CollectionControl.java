@@ -1,16 +1,15 @@
 package lab;
 
-import lab.collection.SpaceMarine;
+import java.util.LinkedList;
 
-import java.util.HashMap;
-
+import lab.collection.*;
 /**
  * Класс доступа к коллекции
  */
 public class CollectionControl {
     FileManager fileManager = new FileManager();
-    HashMap<Long, SpaceMarine> collection;
-    public HashMap<Long, SpaceMarine> getCollection() {
+    LinkedList<Product> collection;
+    public LinkedList<Product> getCollection() {
         return collection;
     }
 
@@ -20,12 +19,12 @@ public class CollectionControl {
      * @return Успешность загрузки.
      */
     public boolean loadCollection(String filePath) {
-        this.collection = fileManager.loadCollection(filePath);
+        collection = fileManager.loadCollection(filePath);
         return collection != null;
     }
 
     /**
-     * Хосраняет коллекцию в файл, из которого она была загружена.
+     * Cохраняет коллекцию в файл, из которого она была загружена.
      * @return Успешность сохранения.
      */
     public boolean saveCollection(){

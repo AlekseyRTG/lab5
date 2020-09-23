@@ -1,8 +1,8 @@
 package lab;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import lab.collection.SpaceMarine;
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+import lab.collection.*;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -12,46 +12,29 @@ public class FileManager {
     File collectionFile;
 
     /**
-     * Загружает поллекцию из файла, указанного в аргументе.
+     * Загружает коллекцию из файла, указанного в аргументе.
      * @param filePath Путь к файлу коллекции.
      * @return Коллекция.
      */
-    public HashMap<Long, SpaceMarine> loadCollection(String filePath) {
-        HashMap<Long, SpaceMarine> collection = new HashMap<Long, SpaceMarine>();
+    public LinkedList<Product> loadCollection(String filePath) {
+        LinkedList<Product> collection = new LinkedList<>();
         if (!setFile(filePath)) return null;
-        else try (BufferedReader bufferedReader = new BufferedReader(new FileReader(collectionFile))) {
-            Gson gson = new Gson();
+        else try {
+            CSVReader reader = new CSVReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(collectionFile))));
             System.out.println("Загрузка коллекции из файла " + collectionFile.getAbsolutePath());
             StringBuilder stringBuilder = new StringBuilder();
-            String nextString;
-            while ((nextString = bufferedReader.readLine()) != null) {
-                stringBuilder.append(nextString);
-            }
-
-            Type typeOfCollection = new TypeToken<HashMap<Long, SpaceMarine>>() {
-            }.getType();
-            try {
-                HashMap<Long, SpaceMarine> addCollection = gson.fromJson(stringBuilder.toString(), typeOfCollection);
-                if (addCollection != null)
-                    for (Map.Entry<Long, SpaceMarine> set : addCollection.entrySet()) {
-//                    if (spaceMarine.checkNull()) {
-//                        throw new JsonSyntaxException("");
-//                    }
-                        collection.put(set.getKey(), set.getValue());
-                    }
-            } catch (JsonSyntaxException e) {
-                System.out.println("Ошибка синтаксиса Json. Файл не может быть загружен.");
-                return null;
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Непредвиденная ошибка при считывании файла.");
-                return null;
-            }
+            String nextString[];
+            while ((nextString = reader.readNext()) != null) {
+                ReadCSV csv = new ReadCSV();
+                Product product = csv.toCSV(nextString);
+                collection.add(product);
             System.out.println("Коллекций успешно загружена. Добавлено " + collection.size() + " элементов.");
-        } catch (IOException e) {
+        }
+        } catch (Exception e) {
             System.out.println("При чтении строк возникла ошибка");
             return null;
         }
+
         return collection;
     }
 
@@ -65,32 +48,32 @@ public class FileManager {
             System.out.println("File path " + path + " is wrong!!!");
             System.exit(1);
         }
-        File jsonPath = new File(path);
-        if (jsonPath.exists()) {
-            setCollectionFile(jsonPath);
+        File CSVPath = new File(path);
+        if (CSVPath.exists()) {
+            setCollectionFile(CSVPath);
             System.out.println("Path " + path + " discovered.");
         } else {
             System.out.println("Path " + path + " does not exist.");
             try {
                 System.out.println("Create a new file.");
-                if (jsonPath.createNewFile()) {
+                if (CSVPath.createNewFile()) {
                     System.out.println("File not created");
                 }
-                setCollectionFile(jsonPath);
-                save(new HashMap<>());
+                setCollectionFile(CSVPath);
+                save(new LinkedList<>());
             } catch (IOException e) {
                 System.out.println("Error creating file!!!");
                 return false;
             }
         }
-        if (!jsonPath.isFile()) {
+        if (!CSVPath.isFile()) {
             System.out.println("Path " + path + " does not contain a file name.");
             return false;
         } else {
             System.out.println("File " + path + " discovered.");
         }
-        if (!(path.lastIndexOf(".json") == path.length() - 5)) {
-            System.out.println("Non .json file format.");
+        if (!(path.lastIndexOf(".csv") == path.length() - 5)) {
+            System.out.println("Non .csv file format.");
             return false;
         }
         return true;
@@ -101,16 +84,18 @@ public class FileManager {
      * @param collection Коллекция.
      * @return Успешность операции сохранения.
      */
-    public boolean save(HashMap<Long, SpaceMarine> collection) {
-        Gson gson = new Gson();
+    public boolean save(LinkedList<Product> collection) {
         if (!collectionFile.exists()) {
             System.out.println(("Невозможно сохранить файл. Файл по указанному пути (" + collectionFile.getAbsolutePath() + ") не существует."));
         } else if (!collectionFile.canRead() || !collectionFile.canWrite()) {
             System.out.println("Невозможно сохранить файл. Файл защищён от чтения и(или) записи.");
         } else {
-            try (FileWriter fileWriter = new FileWriter(collectionFile)) {
-                fileWriter.write(gson.toJson(collection));
-                fileWriter.flush();
+            try {
+                CSVWriter writer = new CSVWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(collectionFile))));
+                for (Product p : collection) {
+                    writer.writeNext(p.toString());
+                    writer.flush();
+                }
                 System.out.println("Файл успешно сохранён.");
                 return true;
             } catch (Exception ex) {
