@@ -1,27 +1,27 @@
 package lab.collection;
 
 public class Coordinates {
-    private Double x; //Значение поля должно быть больше -449, Поле не может быть null
-    private Float y;
+    private Long x; //Поле не должно быть null
+    private Integer y; //Максимальное значение поля: 346, Поле не должно быть null
 
-    public Coordinates(Double x, float y) {
+    public Coordinates(Long x, Integer y) {
         this.x = x;
         this.y = y;
     }
 
-    public void setX(Double x) {
+    public void setX(Long x) {
         this.x = x;
     }
 
-    public void setY(Float y) {
+    public void setY(Integer y) {
         this.y = y;
     }
 
-    public Double getX() {
+    public Long getX() {
         return x;
     }
 
-    public Float getY() {
+    public Integer getY() {
         return y;
     }
 
