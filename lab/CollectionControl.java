@@ -1,20 +1,24 @@
 package lab;
 
 import java.util.LinkedList;
+import java.util.Random;
 
 import lab.collection.*;
+
 /**
  * Класс доступа к коллекции
  */
 public class CollectionControl {
     FileManager fileManager = new FileManager();
     LinkedList<Product> collection;
+
     public LinkedList<Product> getCollection() {
         return collection;
     }
 
     /**
      * Загружает коллекцию из файла.
+     *
      * @param filePath Путь к файлу.
      * @return Успешность загрузки.
      */
@@ -25,9 +29,10 @@ public class CollectionControl {
 
     /**
      * Cохраняет коллекцию в файл, из которого она была загружена.
+     *
      * @return Успешность сохранения.
      */
-    public boolean saveCollection(){
+    public boolean saveCollection() {
         return fileManager.save(collection);
     }
 
@@ -37,8 +42,17 @@ public class CollectionControl {
     @Override
     public String toString() {
         return "Информация о коллекции:\n" +
-                "Файл коллекции: " + fileManager.collectionFile.getAbsolutePath() +"\n"+
+                "Файл коллекции: " + fileManager.collectionFile.getAbsolutePath() + "\n" +
                 "Тип коллекции: " + collection.getClass().toString();
+    }
+
+    public int idGenerate() {
+        Random random = new Random();
+        int newID = random.nextInt();
+        for (Product p : collection) {
+            if (p.getId() == newID) return idGenerate();
+        }
+        return newID;
     }
 }
 

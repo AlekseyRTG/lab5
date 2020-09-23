@@ -22,16 +22,22 @@ public class FileManager {
         else try {
             CSVReader reader = new CSVReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(collectionFile))));
             System.out.println("Загрузка коллекции из файла " + collectionFile.getAbsolutePath());
-            StringBuilder stringBuilder = new StringBuilder();
-            String nextString[];
-            while ((nextString = reader.readNext()) != null) {
+//            StringBuilder stringBuilder = new StringBuilder();
+            String nextStrings[];
+            while ((nextStrings = reader.readNext()) != null) {
                 ReadCSV csv = new ReadCSV();
-                Product product = csv.toCSV(nextString);
-                collection.add(product);
+                for (String next:
+                nextStrings) {
+                    Product product = csv.toCSV(next);
+                    collection.add(product);
+                }
+            }
             System.out.println("Коллекций успешно загружена. Добавлено " + collection.size() + " элементов.");
-        }
+
         } catch (Exception e) {
-            System.out.println("При чтении строк возникла ошибка");
+            System.out.println(e);
+            System.out.println("При чтении строк возникла ошибка.Создайте новый файл.");
+
             return null;
         }
 
@@ -72,7 +78,7 @@ public class FileManager {
         } else {
             System.out.println("File " + path + " discovered.");
         }
-        if (!(path.lastIndexOf(".csv") == path.length() - 5)) {
+        if (!(path.lastIndexOf(".csv") == path.length() - 4)) {
             System.out.println("Non .csv file format.");
             return false;
         }
@@ -92,8 +98,8 @@ public class FileManager {
         } else {
             try {
                 CSVWriter writer = new CSVWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(collectionFile))));
-                for (Product p : collection) {
-                    writer.writeNext(p.toString());
+                for (Product p : collection){
+                    writer.writeNext(toCSV(p));
                     writer.flush();
                 }
                 System.out.println("Файл успешно сохранён.");
@@ -108,5 +114,40 @@ public class FileManager {
     private void setCollectionFile(File collectionFile) {
         this.collectionFile = collectionFile;
     }
+private String toCSV(Product product){
+    String CSV_SEPARATOR = ";";
+    StringBuffer oneLine = new StringBuffer();
+    oneLine.append(product.getId());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getName());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getCoordinates().getX());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getCoordinates().getY());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getCreationDate());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getPrice());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getUnitOfMeasure());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getManufacturer().getId());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getManufacturer().getName());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getManufacturer().getFullName());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getManufacturer().getType());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getManufacturer().getPostalAddress().getStreet());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getManufacturer().getPostalAddress().getTown().getX());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getManufacturer().getPostalAddress().getTown().getY());
+    oneLine.append(CSV_SEPARATOR);
+    oneLine.append(product.getManufacturer().getPostalAddress().getTown().getZ());
+    oneLine.append(CSV_SEPARATOR);
+        return oneLine.toString();
+}
 }
 

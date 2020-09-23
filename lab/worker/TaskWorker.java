@@ -15,18 +15,17 @@ public class TaskWorker {
     {
         commandList.put(CommandType.CLEAR, new CommandClear());
         commandList.put(CommandType.EXECUTE_SCRIPT, new CommandExecuteScript(this));
-        commandList.put(CommandType.GROUP_COUNTING_BY_CREATION_DATE, new CommandGroup());
         commandList.put(CommandType.HELP, new CommandHelp());
-        commandList.put(CommandType.INSERT, new CommandInsert());
-        commandList.put(CommandType.PRINT_ASCENDING, new CommandPrintAscending());
-        commandList.put(CommandType.PRINT_FIELD_DESCENDING_MELEE_WEAPON, new CommandPrintWeapon());
-        commandList.put(CommandType.REMOVE_KEY, new CommandRemoveKey());
-        commandList.put(CommandType.REPLACE_IF_LOWE, new CommandReplaceIfLowe());
+        commandList.put(CommandType.ADD, new CommandAdd());
+        commandList.put(CommandType.PRINT_DESCENDING, new CommandPrintDescending());
+        commandList.put(CommandType.REMOVE_BY_ID, new CommandRemoveById());
         commandList.put(CommandType.SAVE, new CommandSave());
         commandList.put(CommandType.UPDATE, new CommandUpdate());
         commandList.put(CommandType.SHOW, new CommandShow());
-        commandList.put(CommandType.REMOVE_GREATER_KEY, new RemoveGreaterKey());
+        commandList.put(CommandType.REMOVE_LOWER, new RemoveLower());
         commandList.put(CommandType.INFO, new CommandInfo());
+        commandList.put(CommandType.ADD_IF_MIN, new CommandAddIfMin());
+        commandList.put(CommandType.MAX_BY_ID, new CommandMaxById());
     }
 
     public TaskWorker(CollectionControl collectionControl) {

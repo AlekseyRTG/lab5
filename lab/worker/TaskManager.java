@@ -1,8 +1,10 @@
 package lab.worker;
 
-import com.google.gson.Gson;
-import lab.collection.SpaceMarine;
-import lab.collection.SpaceMarineGenerator;
+//import com.google.gson.Gson;
+
+import lab.collection.Product;
+import lab.collection.ProductGenerator;
+import lab.collection.ReadCSV;
 import lab.commands.CommandType;
 
 import java.util.ArrayList;
@@ -13,19 +15,12 @@ import java.util.ArrayList;
 public class TaskManager {
     private static final int HISTORY_SIZE = 7;
     private final String[] taskHistory = new String[HISTORY_SIZE];
-    Gson gson = new Gson();
 
     /**
      * Обновляет исхорию команд пользователя.
      *
      * @param newElement Команда, которую нужно добавить в историю.
      */
-    private void updateHistory(String newElement) {
-        for (int i = HISTORY_SIZE - 1; i >= 1; i--) {
-            taskHistory[i] = taskHistory[i - 1];
-        }
-        taskHistory[0] = newElement;
-    }
 
     /**
      * Выводит историю команд пользователя.
@@ -47,7 +42,6 @@ public class TaskManager {
     public Task getTask(String stringTask, boolean isScriptCommand) {
         Task task = null;
         String command = stringTask.trim().split(" ", 2)[0];
-        updateHistory(command);
         try {
             switch (command) {
                 case "help":
@@ -65,62 +59,53 @@ public class TaskManager {
                 case "save":
                     task = new Task(CommandType.SAVE);
                     break;
+                case "max_by_id":
+                    task = new Task(CommandType.MAX_BY_ID);
+                    break;
                 case "history":
                     getHistory();
                     break;
                 case "exit":
                     System.exit(0);
                     break;
-                case "group_counting_by_creation_date":
-                    task = new Task(CommandType.GROUP_COUNTING_BY_CREATION_DATE);
+                case "print_descending":
+                    task = new Task(CommandType.PRINT_DESCENDING);
                     break;
-                case "print_ascending":
-                    task = new Task(CommandType.PRINT_ASCENDING);
-                    break;
-                case "print_field_descending_melee_weapon":
-                    task = new Task(CommandType.PRINT_FIELD_DESCENDING_MELEE_WEAPON);
-                    break;
-                case "insert":
-                    Long id = null;
-                    try {
-                        id = Long.parseLong(stringTask.trim().split(" ", 2)[1].trim().split(" ")[0]);
-
-                        if (!isScriptCommand) {
-                            SpaceMarine spaceMarine = SpaceMarineGenerator.generate();
-                            if (id != null && spaceMarine != null) {
-                                spaceMarine.setId(id);
-                                task = new Task(CommandType.INSERT, spaceMarine);
-                            }
-                        } else {
-                            SpaceMarine spaceMarine = gson.fromJson(stringTask.trim().split(" ", 2)[1].trim().split(" ")[1], SpaceMarine.class);
-                            if (SpaceMarineGenerator.checkSpaceMarine(spaceMarine))
-                                task = new Task(CommandType.INSERT, spaceMarine);
+                case "add":
+                    if (!isScriptCommand) {
+                        Product product = ProductGenerator.generate();
+                        if (product != null) {
+                            task = new Task(CommandType.ADD, product);
                         }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Ошибка ввода числа (id)");
+                    } else {
+                         Product productA = ReadCSV.toCSV(stringTask.trim().split(" ", 2)[1].trim().split(" ")[0]);
+                            if (ProductGenerator.checkProduct(productA)) {
+                                task = new Task(CommandType.ADD, productA);
+                            }
                     }
                     break;
                 case "update":
-                    Long updateId = null;
+                    Integer updateId = null;
                     try {
-                        updateId = Long.parseLong(stringTask.trim().split(" ", 2)[1].trim().split(" ")[0]);
+                        updateId = Integer.parseInt(stringTask.trim().split(" ", 2)[1].trim().split(" ")[0]);
                         if (!isScriptCommand) {
-                            SpaceMarine updateSpaceMarine = SpaceMarineGenerator.generate();
-                            if (updateId != null && updateSpaceMarine != null) {
-                                updateSpaceMarine.setId(updateId);
-                                task = new Task(CommandType.UPDATE, updateSpaceMarine);
+                            Product updateProduct = ProductGenerator.generate();
+                            if (updateId != null && updateProduct != null) {
+                                updateProduct.setId(updateId);
+                                task = new Task(CommandType.UPDATE, updateProduct);
                             }
                         } else {
-                            SpaceMarine spaceMarine = gson.fromJson(stringTask.trim().split(" ", 2)[1].trim().split(" ")[1], SpaceMarine.class);
-                            if (SpaceMarineGenerator.checkSpaceMarine(spaceMarine))
-                                spaceMarine.setId(updateId);
-                            task = new Task(CommandType.UPDATE, spaceMarine);
+                            Product productU = ReadCSV.toCSV(stringTask.trim().split(" ", 2)[1].trim().split(" ")[1]);
+                            if (ProductGenerator.checkProduct(productU)) {
+                                productU.setId(updateId);
+                                task = new Task(CommandType.UPDATE, productU);
+                            }
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Ошибка ввода числа (id)");
                     }
                     break;
-                case "remove_key":
+                case "remove_by_id":
                     Long removeId = null;
                     try {
                         removeId = Long.parseLong(stringTask.trim().split(" ", 2)[1].trim().split(" ")[0]);
@@ -128,41 +113,33 @@ public class TaskManager {
                         System.out.println("Ошибка ввода числа (id)");
                     }
                     if (removeId != null) {
-                        task = new Task(CommandType.REMOVE_KEY, removeId);
+                        task = new Task(CommandType.REMOVE_BY_ID, removeId);
                     }
                     break;
-                case "remove_greater_key":
-                    Long gRemoveId = null;
-                    try {
-                        gRemoveId = Long.parseLong(stringTask.trim().split(" ", 2)[1]);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Ошибка ввода числа (id)");
-                    }
-                    if (gRemoveId != null) {
-                        task = new Task(CommandType.REMOVE_GREATER_KEY, gRemoveId);
-                    }
-                    break;
-                case "replace_if_lowe":
-                    Long replaceId = null;
-                    try {
-                        replaceId = Long.parseLong(stringTask.trim().split(" ", 2)[1].trim().split(" ")[0]);
-
-                        if (!isScriptCommand) {
-                            SpaceMarine replaceSpaceMarine = SpaceMarineGenerator.generate();
-                            if (replaceId != null && replaceSpaceMarine != null) {
-                                replaceSpaceMarine.setId(replaceId);
-                                task = new Task(CommandType.REPLACE_IF_LOWE, replaceSpaceMarine);
-                            }
-                        } else {
-                            SpaceMarine spaceMarine = gson.fromJson(stringTask.trim().split(" ", 2)[1].trim().split(" ")[1], SpaceMarine.class);
-                            if (SpaceMarineGenerator.checkSpaceMarine(spaceMarine))
-                                spaceMarine.setId(replaceId);
-                            task = new Task(CommandType.REPLACE_IF_LOWE, spaceMarine);
+                case "add_if_min":
+                    if (!isScriptCommand) {
+                        Product product = ProductGenerator.generate();
+                        if (product != null) {
+                            task = new Task(CommandType.ADD_IF_MIN, product);
                         }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Ошибка ввода числа (id)");
+                    } else {
+                        Product product = ReadCSV.toCSV(stringTask.trim().split(" ", 2)[1].trim().split(" ")[0]);
+                        if (ProductGenerator.checkProduct(product))
+                            task = new Task(CommandType.ADD, product);
                     }
                     break;
+                case "remove_lower":
+                    if (!isScriptCommand) {
+                        Product product = ProductGenerator.generate();
+                        if (product != null) {
+                            task = new Task(CommandType.REMOVE_LOWER, product);
+                        }
+                    } else {
+                        Product product = ReadCSV.toCSV(stringTask.trim().split(" ", 2)[1].trim().split(" ")[0]);
+                        if (ProductGenerator.checkProduct(product))
+                            task = new Task(CommandType.REMOVE_LOWER, product);
+                    }
+
                 case "execute_script":
                     String file = stringTask.trim().split(" ", 2)[1];
                     ScriptReader scriptReader = new ScriptReader();
@@ -176,6 +153,8 @@ public class TaskManager {
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Команда " + command + " требует аргумент");
+        } catch (Exception e) {
+            System.out.println("Произошла ошибка");
         }
         return task;
     }

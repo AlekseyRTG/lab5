@@ -15,7 +15,6 @@ public class Address {
         this.street = street;
         this.town = town;
     }
-    public Address(){}
     public String toString() {
         return "_______________________" + "\n" +
                 "Street: " + street + "\n" +

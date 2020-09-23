@@ -94,7 +94,7 @@ public class ProductGenerator {
                 try {
                     String string = scanner.nextLine();
                     if (string.isEmpty()) break;
-                    unitOfMeasure = UnitOfMeasure.valueOf(string);
+                    type = OrganizationType.valueOf(string);
                 } catch (IllegalArgumentException e) {
                     System.out.println("Ошибка ввода");
                     continue;
@@ -135,140 +135,6 @@ public class ProductGenerator {
             Organization manifacturer = new Organization(orgid++,orgName,fullOrgName,type,postalAddress);
             Coordinates coordinates = new Coordinates(x,y);
             product = new Product(id++, name, coordinates, ZonedDateTime.now(),price,unitOfMeasure,manifacturer);
-        } catch (NoSuchElementException e) {
-            System.out.println("Ввод был завершён...");
-        }
-        return product;
-    }
-    public static Product generate(Product product) {
-        try {
-            Scanner scanner = new Scanner(System.in);
-            if (product.getName() == null || product.getName().isEmpty()) {
-                String name;
-                do {
-                    System.out.println("Введите имя Product:");
-                    name = scanner.nextLine();
-                } while (name.isEmpty()||name == null);
-                product.setName(name);
-            }
-            if (product.getCoordinates() == null || product.getCoordinates().getX() == null ||
-                    product.getCoordinates().getY() == null || product.getCoordinates().getY() > 346) {
-                Long x = null;
-                do {
-                    System.out.println("Введите координату X:");
-                    try {
-                        x = Long.valueOf(scanner.nextLine());
-                    } catch (NumberFormatException e) {
-                        System.out.println("Ошибка ввода числа");
-                    }
-                } while (x == null);
-                Integer y = null;
-                do {
-                    System.out.println("Введите координату Y:");
-                    try {
-                        y = Integer.valueOf(scanner.nextLine());
-                        if (y > 346) {
-                            System.out.println("Максимальное значение координаты Y - 346");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Ошибка ввода числа");
-                        continue;
-                    }
-                    break;
-                } while (y == null);
-                product.setCoordinates(new Coordinates(x, y));
-            }
-            if (product.getPrice() < 0) {
-                double price = -1;
-                while (true) {
-                    System.out.println("Введите поле price: ");
-                    try {
-                        String string = scanner.nextLine();
-                        if (string.isEmpty()) break;
-                        price = Double.parseDouble(string);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Ошибка ввода числа");
-                        continue;
-                    }
-                    break;
-                }
-                product.setPrice(price);
-            }
-            if (product.getUnitOfMeasure() == null) {
-                UnitOfMeasure unitOfMeasure;
-                while (true) {
-                    System.out.println("Введите поле Unit Of Measure");
-                    System.out.println("Доступные варианты:");
-                    for (UnitOfMeasure unitOfMeasure1 : UnitOfMeasure.values()) System.out.println(unitOfMeasure1.toString());
-                    try {
-                        String string = scanner.nextLine();
-                        unitOfMeasure = UnitOfMeasure.valueOf(string);
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Ошибка ввода");
-                        continue;
-                    }
-                    break;
-                }
-                product.setUnitOfMeasure(unitOfMeasure);
-            }
-
-            if (product.getManufacturer().getName() == null) {
-                String orgName = null;
-                do {
-                    System.out.println("Введите имя организации:");
-                    try {
-                        orgName = scanner.nextLine();
-                        if (orgName == null) {
-                            System.out.println("Значение поля должно быть не null");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Ошибка ввода числа");
-                    }
-                } while (orgName == null);
-                product.getManufacturer().setName(orgName);
-            }
-            if (product.getManufacturer().getType() == null) {
-                OrganizationType type;
-                while (true) {
-                    System.out.println("Введите поле Organization Type");
-                    System.out.println("Доступные варианты:");
-                    for (OrganizationType type1 : OrganizationType.values()) System.out.println(type1.toString());
-                    try {
-                        String string = scanner.nextLine();
-                        type = OrganizationType.valueOf(string);
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Ошибка ввода");
-                        continue;
-                    }
-                    break;
-                }
-                product.getManufacturer().setType(type);
-            }
-            if (product.getManufacturer().getPostalAddress().getTown() == null) {
-                product.getManufacturer().getPostalAddress().setTown(new Location());
-                if (product.getManufacturer().getPostalAddress().getTown().getX()==null) {
-                    Integer Lx = null;
-                    do {
-                        System.out.println("Введите координату X организации:");
-                        Lx = Integer.valueOf(scanner.nextLine());
-                    } while (Lx == null);
-                    product.getManufacturer().getPostalAddress().getTown().setX(Lx);
-                }
-                if (product.getManufacturer().getPostalAddress().getTown().getY()==null) {
-                    Float Ly = null;
-                    do {
-                        System.out.println("Введите координату Y организации:");
-                        Ly = Float.valueOf(scanner.nextLine());
-                    } while (Ly == null);
-                    product.getManufacturer().getPostalAddress().getTown().setY(Ly);
-                }
-                if (product.getManufacturer().getPostalAddress().getTown().getZ()==null) {
-                    double Lz = 0;
-                        System.out.println("Введите координату Z организации:");
-                        Lz = Double.parseDouble(scanner.nextLine());
-                    product.getManufacturer().getPostalAddress().getTown().setZ(Lz);
-                }
-            }
         } catch (NoSuchElementException e) {
             System.out.println("Ввод был завершён...");
         }

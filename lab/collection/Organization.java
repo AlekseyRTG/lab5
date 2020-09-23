@@ -31,11 +31,10 @@ public class Organization {
     }
     public String toString() {
         return "_______________________" + "\n" +
-                "Id: " + id + "\n" +
                 "Name: " + name + "\n" +
                 "FullName: " + fullName + "\n" +
                 "Organization Type: " + type + "\n" +
-                "Address: " + postalAddress + "\n";
+                "Address: " + postalAddress ;
     }
 }
 
